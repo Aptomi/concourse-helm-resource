@@ -21,9 +21,15 @@ namespace=$(jq -r '.source.namespace // "default"' < $payload)
 release=$(jq -r '.source.release // ""' < $payload)
 tiller_namespace=$(jq -r '.source.tiller_namespace // "kube-system"' < $payload)
 
-current_release=$(jq -r '.version.release' < $payload || true)
+current_release=$(jq -r '.version.release // ""' < $payload || true)
 if [ -z "$release" ]; then
   release="$current_release"
+fi
+
+if [ -z "$release" ]; then
+  echo "No release to check for versions"
+  echo "[]" >&3
+  exit 0
 fi
 
 tls_enabled=$(jq -r '.source.tls_enabled // "false"' < $payload)
