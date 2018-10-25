@@ -62,7 +62,7 @@ setup_kubernetes() {
   source=$2
 
   # Setup kubectl via kubeconfig
-  kubeconfig=$(jq -r '.source.kubeconfig' < $payload)
+  kubeconfig=$(jq -r '.source.kubeconfig // ""' < $payload)
   cluster_url=$(jq -r '.source.cluster_url // ""' < $payload)
   if [ ! -z "$kubeconfig" ]; then
     setup_using_kubeconfig "$kubeconfig"
