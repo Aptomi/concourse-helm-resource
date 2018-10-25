@@ -1,11 +1,16 @@
 #!/bin/bash
 set -e
 
-setup_kubernetes() {
+setup_using_kubeconfig() {
+  kubeconfig=$1
+  mkdir -p /root/.kube
+  echo -n "$kubeconfig" > /root/.kube/config
+}
+
+setup_using_cluster_params() {
   payload=$1
   source=$2
-  # Setup kubectl
-  cluster_url=$(jq -r '.source.cluster_url // ""' < $payload)
+  cluster_url=$3
   if [ -z "$cluster_url" ]; then
     echo "invalid payload (missing cluster_url)"
     exit 1
@@ -43,6 +48,21 @@ setup_kubernetes() {
   fi
 
   kubectl config use-context default
+}
+
+setup_kubernetes() {
+  payload=$1
+  source=$2
+
+  # Setup kubectl via kubeconfig
+  kubeconfig=$(jq -r '.source.kubeconfig // ""' < $payload)
+  cluster_url=$(jq -r '.source.cluster_url // ""' < $payload)
+  if [ ! -z "$kubeconfig" ]; then
+    setup_using_kubeconfig $kubeconfig
+  elif [ ! -z "$cluster_url" ]; then
+    setup_using_cluster_params $payload $source $cluster_url
+  fi
+
   kubectl version
 }
 
