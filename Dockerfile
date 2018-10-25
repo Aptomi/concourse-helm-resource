@@ -1,5 +1,5 @@
 FROM linkyard/docker-helm:2.11.0
-LABEL maintainer "mario.siegenthaler@linkyard.ch"
+LABEL maintainer "roman@aptomi.io"
 
 RUN apk add --update --upgrade --no-cache jq bash curl
 
